@@ -110,7 +110,7 @@ public class CardServiceImpl implements CardService{
 		return cardDTO;
 	}
 
-	public String hidePan(String pan) {
+	public static String hidePan(String pan) {
 		String hiddenPan = pan.replaceAll("(?<=\\d{6})\\d(?=\\d{4})", "*");
 		return hiddenPan;
 	}

@@ -1,0 +1,31 @@
+<div class="container">
+    <div class="card">
+        <div class="header">
+            <h3>Tarjetas y Transacciones</h3>
+        </div>
+        <div class="card-body">
+            <table class="table table-hover">
+                <thead>
+                    <tr class="text-center">
+                        <th>Reference Number</th>
+                        <th>Total Compra</th>
+                        <th>Dirección Compra</th>
+                        <th>Estado</th>
+                        <th>Fecha</th>
+                        <th>Pan</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let transactions of transactiones" class="text-center">
+                        <td>{{transactions.reference_number}}</td>
+                        <td>{{transactions.total_compra}}</td>
+                        <td>{{transactions.direccion_compra}}</td>
+                        <td>{{transactions.estado}}</td>
+                        <td>{{transactions.fecha}}</td>
+                        <td>{{transactions.pan}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

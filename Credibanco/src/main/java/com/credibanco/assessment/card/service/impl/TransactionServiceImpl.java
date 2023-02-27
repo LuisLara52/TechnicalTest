@@ -116,7 +116,7 @@ public class TransactionServiceImpl implements TransactionService{
 		transactionDTO.setDireccion_compra(transaction.getDireccion_compra());
 		transactionDTO.setEstado(transaction.getEstado());
 		transactionDTO.setFecha(transaction.getFecha().toString());
-		System.out.println();
+		transactionDTO.setPan(CardServiceImpl.hidePan(transaction.getPan()));
 		return transactionDTO;
 	}
 	

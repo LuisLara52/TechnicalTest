@@ -10,6 +10,9 @@ public class TransactionDTO {
 	private String reference_number;
 	
 	@JsonProperty
+	private String pan;
+	
+	@JsonProperty
 	private double total_compra;
 	
 	@JsonProperty
@@ -20,6 +23,15 @@ public class TransactionDTO {
 	
 	@JsonProperty
 	private String fecha;
+	
+	
+	public String getPan() {
+		return pan;
+	}
+
+	public void setPan(String pan) {
+		this.pan = pan;
+	}
 
 	public String getReference_number() {
 		return reference_number;
