@@ -17,6 +17,18 @@ public class TransactionOperationsDTO {
 	
 	@JsonProperty
 	private String referenceNumber;
+	
+	public TransactionOperationsDTO() {
+		
+	}
+
+	public TransactionOperationsDTO(String responseCode, String message, String estado, String referenceNumber) {
+		super();
+		this.responseCode = responseCode;
+		this.message = message;
+		this.estado = estado;
+		this.referenceNumber = referenceNumber;
+	}
 
 	public String getResponseCode() {
 		return responseCode;

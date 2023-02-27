@@ -14,10 +14,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.credibanco.assessment.card.dto.request.AddCardRequest;
 import com.credibanco.assessment.card.dto.request.AddTransactionRequest;
 import com.credibanco.assessment.card.dto.request.CancelTransactionRequest;
-import com.credibanco.assessment.card.dto.response.CardOperationsDTO;
 import com.credibanco.assessment.card.dto.response.TransactionDTO;
 import com.credibanco.assessment.card.dto.response.TransactionOperationsDTO;
 import com.credibanco.assessment.card.service.TransactionService;

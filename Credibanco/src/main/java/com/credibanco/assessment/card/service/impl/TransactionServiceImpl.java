@@ -10,18 +10,19 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.credibanco.assessment.card.dto.request.AddTransactionRequest;
 import com.credibanco.assessment.card.dto.request.CancelTransactionRequest;
-import com.credibanco.assessment.card.dto.response.CardDTO;
 import com.credibanco.assessment.card.dto.response.TransactionDTO;
 import com.credibanco.assessment.card.dto.response.TransactionOperationsDTO;
+import com.credibanco.assessment.card.exceptions.ProviderExceptionAddTransact;
+import com.credibanco.assessment.card.exceptions.ProviderExceptionCancelTransact;
 import com.credibanco.assessment.card.model.Card;
 import com.credibanco.assessment.card.model.Transaction;
 import com.credibanco.assessment.card.repository.CardRepository;
 import com.credibanco.assessment.card.repository.TransactionRepository;
 import com.credibanco.assessment.card.service.TransactionService;
+import com.credibanco.assessment.card.utils.StatusCodeEnum;
 
 @Service
 public class TransactionServiceImpl implements TransactionService{
@@ -61,11 +62,23 @@ public class TransactionServiceImpl implements TransactionService{
 					
 					return buildResponseAdd(tr);
 				}else {
-					throw new ProviderException("Tarjeta no enrolada");
+					Transaction tr = new Transaction();
+					tr.setReference_number(addRequest.getReference_number());
+					tr.setPan(addRequest.getPan());
+					tr.setTotal_compra(addRequest.getTotal_compra());
+					tr.setDireccion_compra(addRequest.getDireccion_compra());
+					tr.setEstado("Rechazada");
+					System.out.println(currentDate().toString());
+					tr.setFecha(currentDate());
+					
+					transactionRepository.saveAndFlush(tr);
+					
+					throw new ProviderExceptionAddTransact("Tarjeta no enrolada-"+addRequest.getReference_number());
 				}
 
 			} else {
-				throw new ProviderException("Tarjeta no existe");
+
+				throw new ProviderExceptionAddTransact("Tarjeta no existe-"+addRequest.getReference_number());
 			}
 		} else {
 			throw new ProviderException("Numero de referencia ya existe");
@@ -76,18 +89,23 @@ public class TransactionServiceImpl implements TransactionService{
 	public TransactionOperationsDTO cancelTransaction(CancelTransactionRequest cancelRequest) {
 		Optional<Transaction> optionalT=transactionRepository.findByReferenceNumber(cancelRequest.getReference_number());
 		if(optionalT.isPresent()) {
-			if (isCancel(optionalT.get().getFecha())) {
-				optionalT.get().setEstado("Anulada");
-				
-				transactionRepository.saveAndFlush(optionalT.get());
-				
-				return buildResponseCancel(optionalT.get());
-				
+			if(!optionalT.get().getEstado().equals("Rechazada")) {
+				if (isCancel(optionalT.get().getFecha())) {
+					optionalT.get().setEstado("Anulada");
+					
+					transactionRepository.saveAndFlush(optionalT.get());
+					
+					return buildResponseCancel(optionalT.get());
+					
+				}else {
+					throw new ProviderExceptionCancelTransact("No se puede anular transaccion, pasaron mas de 5 minutos-"+cancelRequest.getReference_number());
+				}
 			}else {
-				throw new ProviderException("No se puede anular transacción, pasaron mas de 5 minutos");
+				throw new ProviderExceptionCancelTransact("No se puede anular transaccion, el estado de la transaccion es 'Rechazada'-"+cancelRequest.getReference_number());
 			}
+
 		}else {
-			throw new ProviderException("El numero de referencia es invalido");
+			throw new ProviderExceptionCancelTransact("El numero de referencia es invalido-"+cancelRequest.getReference_number());
 		}
 	}
 	
@@ -104,8 +122,8 @@ public class TransactionServiceImpl implements TransactionService{
 	
 	private TransactionOperationsDTO buildResponseAdd(Transaction tr) {
 		TransactionOperationsDTO trOp = new TransactionOperationsDTO();
-		trOp.setResponseCode("00");
-		trOp.setMessage("Compra Exitosa");
+		trOp.setResponseCode(StatusCodeEnum.T00.getCode());
+		trOp.setMessage(StatusCodeEnum.T00.getDescription());
 		trOp.setEstado(tr.getEstado());
 		trOp.setReferenceNumber(tr.getReference_number());
 		
@@ -134,8 +152,8 @@ public class TransactionServiceImpl implements TransactionService{
 
 	private TransactionOperationsDTO buildResponseCancel(Transaction tr) {
 		TransactionOperationsDTO trOp = new TransactionOperationsDTO();
-		trOp.setResponseCode("00");
-		trOp.setMessage("Compra Anulada");
+		trOp.setResponseCode(StatusCodeEnum.TC00.getCode());
+		trOp.setMessage(StatusCodeEnum.TC00.getDescription());
 		trOp.setReferenceNumber(tr.getReference_number());
 		
 		return trOp;

@@ -1,6 +1,5 @@
 package com.credibanco.assessment.card.service.impl;
 
-import java.security.ProviderException;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -14,6 +13,9 @@ import com.credibanco.assessment.card.dto.request.OperationsCardRequest;
 import com.credibanco.assessment.card.dto.response.CardDTO;
 import com.credibanco.assessment.card.dto.response.CardOperationsDTO;
 import com.credibanco.assessment.card.exceptions.ProviderExceptionAdd;
+import com.credibanco.assessment.card.exceptions.ProviderExceptionDeleteCard;
+import com.credibanco.assessment.card.exceptions.ProviderExceptionGetCard;
+import com.credibanco.assessment.card.exceptions.ProviderExceptionUpdCard;
 import com.credibanco.assessment.card.model.Card;
 import com.credibanco.assessment.card.repository.CardRepository;
 import com.credibanco.assessment.card.service.CardService;
@@ -39,7 +41,12 @@ public class CardServiceImpl implements CardService{
 	public CardDTO getCard(String pan) {
 		// TODO Auto-generated method stub
 		Optional<Card> optionalC=cardRepository.findByPan(pan);
-		return buildCardDTO(optionalC.get());
+		if(optionalC.isPresent()) {
+			return buildCardDTO(optionalC.get());
+		}else {
+			throw new ProviderExceptionGetCard("Tarjeta no encontrada-"+pan);
+		}
+		
 	}
 	
 	@Override
@@ -59,7 +66,7 @@ public class CardServiceImpl implements CardService{
 			
 			return buildResponseAdd(newCard);
 		} else {
-			throw new ProviderExceptionAdd("La tarjeta ya existe");
+			throw new ProviderExceptionAdd("Fallido-"+addRequest.getPan());
 		}
 	}
 	
@@ -73,10 +80,10 @@ public class CardServiceImpl implements CardService{
 				return buildResponseUpdate(optionalC.get());
 				
 			} else {
-				throw new ProviderException("El numero de validacion no coincide");
+				throw new ProviderExceptionUpdCard("Número de validación inválido-"+hidePan(updateRequest.getPan()));
 			}
 		} else {
-			throw new ProviderException("La tarjeta no existe");
+			throw new ProviderExceptionUpdCard("Tarjeta no existe-"+hidePan(updateRequest.getPan()));
 		}
 	}
 
@@ -89,7 +96,7 @@ public class CardServiceImpl implements CardService{
 			cardRepository.flush();
 			return buildResponseDelete(optionalC.get());
 		}else {
-			throw new ProviderException("No se ha eliminado la tarjeta");
+			throw new ProviderExceptionDeleteCard("No se ha eliminado la tarjeta");
 		}
 	}
 	
@@ -121,8 +128,8 @@ public class CardServiceImpl implements CardService{
 	public CardOperationsDTO buildResponseUpdate(Card card)
 	{
 		CardOperationsDTO cardOp = new CardOperationsDTO();
-		cardOp.setResponseCode("00");
-		cardOp.setMessage("Exito");
+		cardOp.setResponseCode(StatusCodeEnum.CU00.getCode());
+		cardOp.setMessage(StatusCodeEnum.CU00.getDescription());
 		cardOp.setPan(hidePan(card.getPan()));
 		return cardOp;
 	}
@@ -130,8 +137,8 @@ public class CardServiceImpl implements CardService{
 	public CardOperationsDTO buildResponseDelete(Card card)
 	{
 		CardOperationsDTO cardOp = new CardOperationsDTO();
-		cardOp.setResponseCode("00");
-		cardOp.setMessage("Tarjeta eliminada correctamente");
+		cardOp.setResponseCode(StatusCodeEnum.CD00.getCode());
+		cardOp.setMessage(StatusCodeEnum.CD00.getDescription());
 		return cardOp;
 	}
 	

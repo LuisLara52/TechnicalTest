@@ -12,20 +12,34 @@ public class CardOperationsDTO {
 	private String message;
 	
 	@JsonProperty
-	private String pan;
-	
-	@JsonProperty
 	private String validationNum;
 	
-	public CardOperationsDTO(String responseCode, String message, String pan, String validationNum) {
+	@JsonProperty
+	private String pan;
+	
+	public CardOperationsDTO() {
+		
+	}
+			
+	public CardOperationsDTO(String responseCode, String message,String validationNum, String pan) {
+		super();
+		this.responseCode = responseCode;
+		this.message = message;
+		this.validationNum = validationNum;
+		this.pan = pan;
+	}
+	
+	public CardOperationsDTO(String responseCode, String message, String pan) {
 		super();
 		this.responseCode = responseCode;
 		this.message = message;
 		this.pan = pan;
-		this.validationNum = validationNum;
 	}
 	
-	public CardOperationsDTO() {
+	public CardOperationsDTO(String responseCode, String message) {
+		super();
+		this.responseCode = responseCode;
+		this.message = message;
 	}
 
 	public String getPan() {
